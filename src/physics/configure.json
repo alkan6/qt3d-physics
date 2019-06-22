@@ -1,0 +1,56 @@
+{
+    "module" : "3dphysics",
+    "testDir" : "../../config.tests",
+
+    "commandline" : {
+        "options" : {
+            "ode" : "boolean",
+            "qt3d-physics" : "boolean"
+        }
+    },
+
+    "libraries" : {
+        "ode" :{
+            "label" : "ODE",
+            "test" : "ode",
+            "sources" : [
+                { "type" : "pkgConfig", "args" : "ode >= 0.14" },
+                "-lode"
+            ]
+        }
+    },
+
+    "features" : {
+        "ode" : {
+            "label" : "ODE",
+            "output" : ["privateFeature", "feature"]
+        },
+        "qt3d-physics" : {
+            "label" : "Physics aspect",
+            "purpose" : "Use the 3D Physics Aspect library",
+            "section" : "Aspects",
+            "condition" : "features.ode && libs.ode",
+            "output" : [ "publicFeature" ]
+        }
+    },
+
+    "report": [
+    ],
+
+    "summary" : [
+        {
+            "section" : "Qt 3D Physics",
+            "entries" : [
+                "ode",
+                {
+                    "section" : "Aspects",
+                    "entries" : [
+                        "qt3d-physics"
+                    ]
+                }
+
+            ]
+        }
+
+    ]
+}
