@@ -1,4 +1,4 @@
-#include "qphysicsengine_p.h"
+#include "odeengine.h"
 
 #include <QDebug>
 
@@ -6,20 +6,17 @@ QT_BEGIN_NAMESPACE
 
 namespace Qt3DPhysics {
 
-QPhysicsEngine::QPhysicsEngine()
-    :QObject()
+OdeEngine::OdeEngine()
+    : QPhysicsEngine()
 {
     qDebug() << __PRETTY_FUNCTION__;
-
 }
 
-QPhysicsEngine::~QPhysicsEngine()
+OdeEngine::~OdeEngine()
 {
     qDebug() << __PRETTY_FUNCTION__;
-
 }
 
 }
 
 QT_END_NAMESPACE
-

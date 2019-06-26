@@ -1,22 +1,25 @@
 #include "qphysicsengineplugin_p.h"
 
+#include <QtDebug>
+
 QT_BEGIN_NAMESPACE
 
 namespace Qt3DPhysics {
 
-QQPhysicsEnginePlugin::QQPhysicsEnginePlugin(QObject *parent)
+QPhysicsEnginePlugin::QPhysicsEnginePlugin(QObject *parent)
     : QObject(parent)
 {
-
+    qDebug() << __PRETTY_FUNCTION__;
 }
 
-QQPhysicsEnginePlugin::~QQPhysicsEnginePlugin()
+QPhysicsEnginePlugin::~QPhysicsEnginePlugin()
 {
-
+    qDebug() << __PRETTY_FUNCTION__;
 }
 
-QPhysicsEngine *QQPhysicsEnginePlugin::create(const QString &key, const QStringList &paramList)
+QPhysicsEngine *QPhysicsEnginePlugin::create(const QString &key, const QStringList &paramList)
 {
+    qDebug() << __PRETTY_FUNCTION__;
     return nullptr;
 }
 

@@ -1,6 +1,7 @@
-#ifndef Qt3DPHYSICS_QPHYSICSENGINEFACTORY_P_H
-#define Qt3DPHYSICS_QPHYSICSENGINEFACTORY_P_H
+#ifndef QT3DPHYSICS_QPHYSICSENGINEFACTORY_P_H
+#define QT3DPHYSICS_QPHYSICSENGINEFACTORY_P_H
 
+#include <Qt3DPhysics/private/qt3dphysics_global_p.h>
 #include <QtCore/qstringlist.h>
 
 QT_BEGIN_NAMESPACE
@@ -9,7 +10,7 @@ namespace Qt3DPhysics {
 
 class QPhysicsEngine;
 
-class QPhysicsEngineFactory {
+class QT3DPHYSICS_PRIVATE_EXPORT QPhysicsEngineFactory {
 public:
     static QStringList keys(const QString &pluginPath = QString());
     static QPhysicsEngine * create(const QString &name,

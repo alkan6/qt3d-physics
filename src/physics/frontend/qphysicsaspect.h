@@ -15,8 +15,12 @@ class QT3DPHYSICSSHARED_EXPORT QPhysicsAspect : public Qt3DCore::QAbstractAspect
 {
     Q_OBJECT
 public:
+
     explicit QPhysicsAspect(QObject *parent = nullptr);
+    explicit QPhysicsAspect(const QString &engine, QObject *parent = nullptr);
     ~QPhysicsAspect() override;
+
+    static QStringList availableEngines();
 
 protected:
     explicit QPhysicsAspect(QPhysicsAspectPrivate &dd, QObject *parent);

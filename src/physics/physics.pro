@@ -17,6 +17,6 @@ HEADERS += \
 SOURCES +=
 
 MODULE_PLUGIN_TYPES = \
-    engines
+    physicsengines
 
 load(qt_module)
