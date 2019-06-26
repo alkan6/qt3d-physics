@@ -1,6 +1,8 @@
 #include "qphysicsaspect.h"
 #include "qphysicsaspect_p.h"
 
+#include <Qt3DPhysics/private/qt3dphysics-config_p.h>
+#include <Qt3DPhysics/private/qphysicsenginefactory_p.h>
 #include <Qt3DPhysics/private/manager_p.h>
 
 #include <Qt3DPhysics/qrigidbody.h>
@@ -24,6 +26,7 @@ QPhysicsAspectPrivate::QPhysicsAspectPrivate()
     , m_manager(new Physics::Manager)
 {
     qDebug() << __PRETTY_FUNCTION__;
+    loadPhysicsEngines();
 }
 
 
@@ -49,6 +52,16 @@ void QPhysicsAspectPrivate::registerBackendTypes()
                         m_manager.data())));
 }
 
+void QPhysicsAspectPrivate::loadPhysicsEngines()
+{
+    const QStringList keys = QPhysicsEngineFactory::keys();
+//    for (const QString &key : keys) {
+//        QPhsysicsIface *engineIface = QPhysicsPluginFactory::create(key, QStringList());
+//        if (engineIface != nullptr)
+//            m_engineIface.append(engineIface);
+//    }
+}
+
 QPhysicsAspect::QPhysicsAspect(QObject *parent)
     : QPhysicsAspect(*new QPhysicsAspectPrivate, parent)
 {
@@ -60,7 +73,7 @@ QPhysicsAspect::QPhysicsAspect(QPhysicsAspectPrivate &dd, QObject *parent)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    Q_D(QPhysicsAspect);  
+    Q_D(QPhysicsAspect);
     setObjectName(QStringLiteral("Physics Aspect"));
     d->registerBackendTypes();
 }

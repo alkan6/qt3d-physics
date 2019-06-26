@@ -20,6 +20,7 @@ public:
 
 
     void registerBackendTypes();
+    void loadPhysicsEngines();
 
     qint64 m_time;
     bool m_initialized;

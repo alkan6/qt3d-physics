@@ -6,6 +6,7 @@ QT      = core-private gui-private 3dcore-private
 DEFINES += QT3DPHYSICS_LIBRARY
 DEFINES += QT_NO_FOREACH
 
+include(engine/engine.pri)
 include(frontend/frontend.pri)
 include(backend/backend.pri)
 

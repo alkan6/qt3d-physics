@@ -1,7 +1,6 @@
 #ifndef QT3DPHYSICS_QRIGIDBODY_P_H
 #define QT3DPHYSICS_QRIGIDBODY_P_H
 
-#include <Qt3DPhysics/private/qt3dphysics_global_p.h>
 #include <Qt3DCore/private/qcomponent_p.h>
 #include <Qt3DPhysics/qrigidbody.h>
 
@@ -15,7 +14,7 @@ namespace Qt3DPhysics {
 
 class QRigidBody;
 
-class QT3DPHYSICS_PRIVATE_EXPORT QRigidBodyPrivate : public Qt3DCore::QComponentPrivate
+class QRigidBodyPrivate : public Qt3DCore::QComponentPrivate
 {
 
 public:
