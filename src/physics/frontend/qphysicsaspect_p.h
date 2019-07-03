@@ -10,11 +10,18 @@ QT_BEGIN_NAMESPACE
 
 namespace Qt3DPhysics {
 
-class QPhysicsEngine;
-
 namespace Physics {
 class Manager;
 }
+
+namespace Engine {
+class QPhysicsEngine;
+}
+
+namespace Jobs {
+class SimulJob;
+}
+
 
 class QPhysicsAspectPrivate : public Qt3DCore::QAbstractAspectPrivate
 {
@@ -26,15 +33,16 @@ public:
     void registerBackendTypes();
     void unregisterBackendTypes();
     void loadPhysicsEngines();
+    void selectPysicsEngine();
 
     qint64 m_time;
+    float m_simStep;
     bool m_initialized;
     QScopedPointer<Physics::Manager> m_manager;
+    QMap<QString, QSharedPointer<Engine::QPhysicsEngine>> m_engines;
+    QSharedPointer<Jobs::SimulJob> m_simulJob;
 
     QString m_engineType;
-    QMap<QString, QPhysicsEngine*> m_engines;
-    QPhysicsEngine * m_engine;
-
     Q_DECLARE_PUBLIC(QPhysicsAspect)
 };
 

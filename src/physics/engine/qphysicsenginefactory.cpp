@@ -12,6 +12,7 @@
 QT_BEGIN_NAMESPACE
 
 namespace Qt3DPhysics {
+namespace Engine {
 
 Q_GLOBAL_STATIC_WITH_ARGS(QFactoryLoader, loader, (QPhysicsEngineFactoryInterface_iid, QLatin1String("/physicsengines"), Qt::CaseInsensitive))
 #ifndef QT_NO_LIBRARY
@@ -63,6 +64,7 @@ QPhysicsEngine * QPhysicsEngineFactory::create(const QString &name, const QStrin
     return qLoadPlugin<QPhysicsEngine, QPhysicsEnginePlugin>(loader(), name, args);
 }
 
+}
 }
 
 QT_END_NAMESPACE

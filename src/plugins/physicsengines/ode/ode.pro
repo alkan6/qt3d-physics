@@ -1,6 +1,9 @@
 TARGET = odephysics
 QT += core-private 3dcore-private 3dphysics-private
 
+CONFIG +=  link_pkgconfig
+PKGCONFIG += ode
+
 HEADERS += \
     odeengine.h
 

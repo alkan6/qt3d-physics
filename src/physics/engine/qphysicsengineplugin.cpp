@@ -5,7 +5,7 @@
 QT_BEGIN_NAMESPACE
 
 namespace Qt3DPhysics {
-
+namespace Engine {
 QPhysicsEnginePlugin::QPhysicsEnginePlugin(QObject *parent)
     : QObject(parent)
 {
@@ -17,12 +17,11 @@ QPhysicsEnginePlugin::~QPhysicsEnginePlugin()
     qDebug() << __PRETTY_FUNCTION__;
 }
 
-QPhysicsEngine *QPhysicsEnginePlugin::create(const QString &key, const QStringList &paramList)
+QPhysicsEngine * QPhysicsEnginePlugin::create(const QString &key, const QStringList &paramList)
 {
-    qDebug() << __PRETTY_FUNCTION__;
     return nullptr;
 }
-
+}
 }
 
 QT_END_NAMESPACE

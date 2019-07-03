@@ -22,6 +22,8 @@ public:
 
     static QStringList availableEngines();
 
+    void setGravity(const QVector3D &gravity);
+
 protected:
     explicit QPhysicsAspect(QPhysicsAspectPrivate &dd, QObject *parent);
 

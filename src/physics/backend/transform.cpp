@@ -28,7 +28,7 @@ Transform::Transform()
 
 void Transform::initializeFromPeer(const Qt3DCore::QNodeCreatedChangeBasePtr &change)
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    //qDebug() << __PRETTY_FUNCTION__;
     const auto typedChange = qSharedPointerCast<Qt3DCore::QNodeCreatedChange<Qt3DCore::QTransformData>>(change);
     const auto &data = typedChange->data;
     m_rotation = data.rotation;
@@ -44,7 +44,7 @@ void Transform::initializeFromPeer(const Qt3DCore::QNodeCreatedChangeBasePtr &ch
 
 void Transform::sceneChangeEvent(const Qt3DCore::QSceneChangePtr &e)
 {
-    qDebug() << __PRETTY_FUNCTION__ << e->type();
+    //qDebug() << __PRETTY_FUNCTION__ << e->type();
 
     if(e->type() == Qt3DCore::PropertyUpdated){
         Qt3DCore::QPropertyUpdatedChangePtr change =
@@ -58,13 +58,13 @@ void Transform::sceneChangeEvent(const Qt3DCore::QSceneChangePtr &e)
 TransformFunctor::TransformFunctor(Manager *manager)
     : m_manager(manager)
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    //qDebug() << __PRETTY_FUNCTION__;
 }
 
 Qt3DCore::QBackendNode *TransformFunctor::create(
         const Qt3DCore::QNodeCreatedChangeBasePtr &change) const
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    //qDebug() << __PRETTY_FUNCTION__;
 
     Transform *handler = m_manager->transformManager()->getOrCreateResource(change->subjectId());
     handler->setManager(m_manager);
@@ -74,14 +74,14 @@ Qt3DCore::QBackendNode *TransformFunctor::create(
 
 Qt3DCore::QBackendNode *TransformFunctor::get(Qt3DCore::QNodeId id) const
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    //qDebug() << __PRETTY_FUNCTION__;
 
     return m_manager->transformManager()->lookupResource(id);
 }
 
 void TransformFunctor::destroy(Qt3DCore::QNodeId id) const
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    //qDebug() << __PRETTY_FUNCTION__;
 
     //m_manager->removeEntityBody(id);
     m_manager->transformManager()->releaseResource(id);

@@ -24,10 +24,10 @@ RigidBody::RigidBody()
 void RigidBody::initializeFromPeer(const Qt3DCore::QNodeCreatedChangeBasePtr &change)
 {
     qDebug() << __PRETTY_FUNCTION__;
-    const auto typedChange = qSharedPointerCast<Qt3DCore::QNodeCreatedChange<QRigidBodyData>>(change);
-    const auto &data = typedChange->data;
-    m_mass = data.mass;
+    const QSharedPointer<Qt3DCore::QNodeCreatedChange<QRigidBodyData>> typedChange =
+            qSharedPointerCast<Qt3DCore::QNodeCreatedChange<QRigidBodyData>>(change);
 
+    m_mass = typedChange->data.mass;
     m_manager->appendRigidBody(this);
 }
 

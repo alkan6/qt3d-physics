@@ -1,10 +1,10 @@
 #include "qphysicsaspect.h"
 #include "qphysicsaspect_p.h"
 
-#include <Qt3DPhysics/private/qt3dphysics-config_p.h>
+#include <Qt3DPhysics/private/manager_p.h>
 #include <Qt3DPhysics/private/qphysicsenginefactory_p.h>
 #include <Qt3DPhysics/private/qphysicsengine_p.h>
-#include <Qt3DPhysics/private/manager_p.h>
+#include <Qt3DPhysics/private/simuljob_p.h>
 
 #include <Qt3DPhysics/qrigidbody.h>
 #include <Qt3DCore/qentity.h>
@@ -13,6 +13,8 @@
 #include <Qt3DPhysics/private/rigidbody_p.h>
 #include <Qt3DPhysics/private/entity_p.h>
 #include <Qt3DPhysics/private/transform_p.h>
+
+#include <cmath>
 
 #include <QDebug>
 
@@ -23,21 +25,22 @@ namespace Qt3DPhysics {
 QPhysicsAspectPrivate::QPhysicsAspectPrivate(const QString &engine)
     : QAbstractAspectPrivate()
     , m_time(0)
+    , m_simStep(1.0f/60.0f)
     , m_initialized(false)
     , m_manager(new Physics::Manager)
+    , m_simulJob(new Jobs::SimulJob(m_manager.data()))
     , m_engineType(engine)
-    , m_engine(nullptr)
+
 
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    qDebug() << __PRETTY_FUNCTION__;   
+    m_simulJob->setStep(m_simStep);
+    loadPhysicsEngines();
 }
 
 
 QPhysicsAspectPrivate::~QPhysicsAspectPrivate()
 {
-    m_engine = nullptr;
-    qDeleteAll(m_engines);
-    m_engines.clear();
 }
 
 void QPhysicsAspectPrivate::registerBackendTypes()
@@ -73,18 +76,44 @@ void QPhysicsAspectPrivate::unregisterBackendTypes()
 
 }
 
+
 void QPhysicsAspectPrivate::loadPhysicsEngines()
 {
     qDebug() << __PRETTY_FUNCTION__;
-    const QStringList keys = QPhysicsEngineFactory::keys();
+
+    Engine::QPhysicsEngine * e;
+    const QStringList keys = Engine::QPhysicsEngineFactory::keys();
+
     for (const QString &key : keys) {
         if(m_engines.contains(key)) continue;
+        e = Engine::QPhysicsEngineFactory::create(key, QStringList());
+        if(e == nullptr) continue;
+        m_engines[key].reset(e);
+    }
+}
 
-        QPhysicsEngine *engine = QPhysicsEngineFactory::create(key, QStringList());
-        if (engine == nullptr) continue;
-        m_engines[key] = engine;
+void QPhysicsAspectPrivate::selectPysicsEngine()
+{
+    //selects physics engine plugin
+    Engine::QPhysicsEnginePtr e;
+    if(m_engines.contains(m_engineType)){
+        //get requested engine
+        e = m_engines[m_engineType];
+    } else if (m_engines.contains(QLatin1String("ode"))){
+        //fall back to default ODE engine
+        m_engineType = QLatin1String("ode");
+        e = m_engines[m_engineType];
+    } else if (!m_engines.isEmpty()) {
+        //fall back to first available engine
+        m_engineType = m_engines.firstKey();
+        e = m_engines[m_engineType];
+    } else {
+        //qWarning(tr("Unable to find any physics engine!"));
+        e.clear();
+        m_engineType.clear();
     }
 
+    m_manager->setEngine(e);
 }
 
 QPhysicsAspect::QPhysicsAspect(QObject *parent)
@@ -103,8 +132,6 @@ QPhysicsAspect::QPhysicsAspect(QPhysicsAspectPrivate &dd, QObject *parent)
     : QAbstractAspect(dd, parent)
 {
     qDebug() << __PRETTY_FUNCTION__;
-
-    Q_D(QPhysicsAspect);
     setObjectName(QStringLiteral("Physics Aspect"));
 }
 
@@ -117,16 +144,43 @@ QStringList QPhysicsAspect::availableEngines()
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    return QPhysicsEngineFactory::keys();
+    return Engine::QPhysicsEngineFactory::keys();
+}
+
+void QPhysicsAspect::setGravity(const QVector3D &gravity)
+{
+    Q_D(QPhysicsAspect);
+    d->m_manager->setGravity(gravity);
+
 }
 
 QVector<Qt3DCore::QAspectJobPtr> QPhysicsAspect::jobsToExecute(qint64 time)
 {
-    //qDebug() << __PRETTY_FUNCTION__ << time;
+    //qDebug() << __PRETTY_FUNCTION__;
 
     QVector<Qt3DCore::QAspectJobPtr> jobs;
+
+    Q_D(QPhysicsAspect);
+
+    //calculate delta time to run the simulation
+    if(d->m_time==0) d->m_time = time;
+    const qint64 dTime = time - d->m_time;
+    float dt = static_cast<float>(dTime) / 1.0e9f;
+    d->m_time = time;
+
+    if(dt >= d->m_simStep){
+        //run simulation to the closest time point
+        //this is to keep simulation step constant, otherwise engines sacmalar
+        d->m_simulJob->setDeltaTime(dt);
+        jobs << d->m_simulJob;
+        d->m_time -= dTime % qint64(d->m_simStep*1.0e9f);
+    }
+
+    jobs << d->m_manager->engineJobs();
     return jobs;
 }
+
+
 
 void QPhysicsAspect::onRegistered()
 {
@@ -134,23 +188,9 @@ void QPhysicsAspect::onRegistered()
 
     Q_D(QPhysicsAspect);
     d->registerBackendTypes();
-    d->loadPhysicsEngines();
+    d->selectPysicsEngine();
 
-    if(d->m_engines.contains(d->m_engineType)){
-        //get requested engine
-        d->m_engine = d->m_engines[d->m_engineType];
-    } else if (d->m_engines.contains(QLatin1String("ode"))){
-        //fall back to default ODE engine
-        d->m_engineType = QLatin1String("ode");
-        d->m_engine = d->m_engines[d->m_engineType];
-    } else if (!d->m_engines.isEmpty()) {
-        //fall back to first available engine
-        d->m_engineType = d->m_engines.firstKey();
-        d->m_engine = d->m_engines[d->m_engineType];
-    } else {
-        //qWarning(tr("Unable to find any physics engine!"));
-        d->m_engine = nullptr;
-    }
+    d->m_manager->engine()->init();
 }
 
 void QPhysicsAspect::onUnregistered()
@@ -159,22 +199,22 @@ void QPhysicsAspect::onUnregistered()
 
     Q_D(QPhysicsAspect);
 
-    d->m_engine = nullptr;
-    qDeleteAll(d->m_engines);
-    d->m_engines.clear();
-
     d->unregisterBackendTypes();
-
+    d->m_manager->engine()->close();
 }
 
 void QPhysicsAspect::onEngineStartup()
 {
     qDebug() << __PRETTY_FUNCTION__;
+    Q_D(QPhysicsAspect);
+    d->m_manager->engine()->startup();
 }
 
 void QPhysicsAspect::onEngineShutdown()
 {
     qDebug() << __PRETTY_FUNCTION__;
+    Q_D(QPhysicsAspect);
+    d->m_manager->engine()->shutdown();
 }
 
 }

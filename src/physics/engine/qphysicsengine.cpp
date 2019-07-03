@@ -5,6 +5,7 @@
 QT_BEGIN_NAMESPACE
 
 namespace Qt3DPhysics {
+namespace Engine {
 
 QPhysicsEngine::QPhysicsEngine()
     :QObject()
@@ -19,6 +20,7 @@ QPhysicsEngine::~QPhysicsEngine()
 
 }
 
+}
 }
 
 QT_END_NAMESPACE

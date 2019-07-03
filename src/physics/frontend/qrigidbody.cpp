@@ -64,11 +64,12 @@ Qt3DCore::QNodeCreatedChangeBasePtr QRigidBody::createNodeCreationChange() const
     qDebug() << __PRETTY_FUNCTION__;
 
     Q_D(const QRigidBody);
-    auto creationChange = Qt3DCore::QNodeCreatedChangePtr<QRigidBodyData>::create(this);
-    auto &data = creationChange->data;
+    QSharedPointer<Qt3DCore::QNodeCreatedChange<QRigidBodyData>> creationChange;
+    creationChange= Qt3DCore::QNodeCreatedChangePtr<QRigidBodyData>::create(this);
+    QRigidBodyData &data = creationChange->data;
     data.mass = d->m_mass;
 
-    return creationChange;
+    return Qt3DCore::QNodeCreatedChangeBasePtr(creationChange);
 
 }
 
