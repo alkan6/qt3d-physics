@@ -15,18 +15,17 @@ namespace Jobs {
 class SimulJob : public Qt3DCore::QAspectJob
 {
 public:
-    SimulJob(Physics::Manager *manager);
+    SimulJob(Physics::Manager *manager, qint64 step);
 
-    void setStep(float step) { m_step = step; }
-    void setDeltaTime(float dt) { m_dt = dt; }
+    void setStep(qint64 step) { m_step = step; }
+    qint64 step() const { return m_step; }
 
 protected:
     void run() final;
 
 private:
     Physics::Manager * m_manager;
-    float m_dt;
-    float m_step;
+    qint64 m_step;
 };
 
 typedef QSharedPointer<SimulJob> SimulJobPtr;

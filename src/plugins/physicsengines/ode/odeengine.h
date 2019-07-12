@@ -24,7 +24,7 @@ public:
     void shutdown() override;
 
     void setGravity(const QVector3D &gravity) override;
-    void step(float dt) override;
+    void step(double dt) override;
 
 private:
     bool m_running;

@@ -25,16 +25,14 @@ namespace Qt3DPhysics {
 QPhysicsAspectPrivate::QPhysicsAspectPrivate(const QString &engine)
     : QAbstractAspectPrivate()
     , m_time(0)
-    , m_simStep(1.0f/60.0f)
     , m_initialized(false)
     , m_manager(new Physics::Manager)
-    , m_simulJob(new Jobs::SimulJob(m_manager.data()))
+    , m_simulJob(new Jobs::SimulJob(m_manager.data(), 1000000000/60))
     , m_engineType(engine)
 
 
 {
     qDebug() << __PRETTY_FUNCTION__;   
-    m_simulJob->setStep(m_simStep);
     loadPhysicsEngines();
 }
 
@@ -162,20 +160,21 @@ QVector<Qt3DCore::QAspectJobPtr> QPhysicsAspect::jobsToExecute(qint64 time)
 
     Q_D(QPhysicsAspect);
 
-    //calculate delta time to run the simulation
-    if(d->m_time==0) d->m_time = time;
-    const qint64 dTime = time - d->m_time;
-    float dt = static_cast<float>(dTime) / 1.0e9f;
-    d->m_time = time;
 
-    if(dt >= d->m_simStep){
-        //run simulation to the closest time point
-        //this is to keep simulation step constant, otherwise engines sacmalar
-        d->m_simulJob->setDeltaTime(dt);
+
+    if(d->m_time==0) d->m_time = time;//first run
+
+    //calculate delta time to run the simulation
+    qint64 dt = time - d->m_time;
+    qint64 step = d->m_simulJob->step();
+    //queue simul jobs to advance to the current time
+    while(dt >= step){
         jobs << d->m_simulJob;
-        d->m_time -= dTime % qint64(d->m_simStep*1.0e9f);
+        dt -= step;
+        d->m_time += step;
     }
 
+    //append manager engine jobs
     jobs << d->m_manager->engineJobs();
     return jobs;
 }
@@ -191,6 +190,7 @@ void QPhysicsAspect::onRegistered()
     d->selectPysicsEngine();
 
     d->m_manager->engine()->init();
+    d->m_time = 0;
 }
 
 void QPhysicsAspect::onUnregistered()
@@ -199,8 +199,8 @@ void QPhysicsAspect::onUnregistered()
 
     Q_D(QPhysicsAspect);
 
-    d->unregisterBackendTypes();
     d->m_manager->engine()->close();
+    d->unregisterBackendTypes();
 }
 
 void QPhysicsAspect::onEngineStartup()
@@ -208,6 +208,7 @@ void QPhysicsAspect::onEngineStartup()
     qDebug() << __PRETTY_FUNCTION__;
     Q_D(QPhysicsAspect);
     d->m_manager->engine()->startup();
+    d->m_time = 0;
 }
 
 void QPhysicsAspect::onEngineShutdown()

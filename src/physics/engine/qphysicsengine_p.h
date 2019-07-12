@@ -21,7 +21,7 @@ public:
     virtual void startup() = 0;
     virtual void shutdown() = 0;
     virtual void setGravity(const QVector3D &gravity) = 0;
-    virtual void step(float dt) = 0;
+    virtual void step(double dt) = 0;
 
 };
 

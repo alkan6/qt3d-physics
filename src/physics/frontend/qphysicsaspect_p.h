@@ -36,7 +36,6 @@ public:
     void selectPysicsEngine();
 
     qint64 m_time;
-    float m_simStep;
     bool m_initialized;
     QScopedPointer<Physics::Manager> m_manager;
     QMap<QString, QSharedPointer<Engine::QPhysicsEngine>> m_engines;

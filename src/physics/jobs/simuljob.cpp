@@ -4,33 +4,27 @@
 #include <Qt3DPhysics/private/manager_p.h>
 
 #include <QDebug>
-#include <QThread>
 
 QT_BEGIN_NAMESPACE
 
 namespace Qt3DPhysics {
 namespace Jobs {
 
-SimulJob::SimulJob(Physics::Manager *manager)
+SimulJob::SimulJob(Physics::Manager *manager, qint64 step)
     : Qt3DCore::QAspectJob()
     , m_manager(manager)
-    , m_dt(1.0f/60.0f)
-    , m_step(1.0f/60.0f)
+    , m_step(step)
 {
     //qDebug() << __PRETTY_FUNCTION__;
 }
 
 void SimulJob::run()
 {
-    //qDebug() << __PRETTY_FUNCTION__ << QThread::currentThreadId();
+
     QSharedPointer<Engine::QPhysicsEngine> e = m_manager->engine();
     if(e.isNull()) return;
 
-    float t = 0.0f;
-    while(t<m_dt){
-        e->step(m_step);
-        t+= m_step;
-    }
+    e->step(static_cast<double>(m_step)/1.0E9);
 }
 
 }
